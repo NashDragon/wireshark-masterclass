@@ -57,7 +57,7 @@
                     </div>
                 </div>
 
-                <!-- Nav Links -->
+                <!-- Nav Links with proper IDs -->
                 <nav class="hidden lg:flex space-x-1 text-sm font-medium">
                     <button onclick="switchTab('overview')" id="nav-overview" class="nav-btn text-teal-400 bg-slate-800 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
                         <span>📖</span> Overview
@@ -91,17 +91,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Mobile Nav Bar -->
-        <div class="lg:hidden flex overflow-x-auto border-t border-slate-800 p-2 gap-1 text-xs font-medium no-scrollbar bg-slate-950">
-            <button onclick="switchTab('overview')" class="px-3 py-1.5 rounded bg-slate-800 text-teal-400 whitespace-nowrap">Overview</button>
-            <button onclick="switchTab('simulator')" class="px-3 py-1.5 rounded bg-slate-900 text-slate-300 whitespace-nowrap">Capture Lab</button>
-            <button onclick="switchTab('analytics')" class="px-3 py-1.5 rounded bg-slate-900 text-slate-300 whitespace-nowrap">Analytics</button>
-            <button onclick="switchTab('filters')" class="px-3 py-1.5 rounded bg-slate-900 text-slate-300 whitespace-nowrap">Filters</button>
-            <button onclick="switchTab('labs')" class="px-3 py-1.5 rounded bg-slate-900 text-slate-300 whitespace-nowrap">Threat Labs</button>
-            <button onclick="switchTab('tshark')" class="px-3 py-1.5 rounded bg-slate-900 text-slate-300 whitespace-nowrap">tshark CLI</button>
-            <button onclick="switchTab('cert')" class="px-3 py-1.5 rounded bg-slate-900 text-slate-300 whitespace-nowrap">Certificate</button>
-        </div>
     </header>
 
     <!-- Main Container -->
@@ -131,27 +120,27 @@
                 </div>
             </div>
 
-            <!-- Core Fundamentals Cards -->
+            <!-- Core Fundamentals Cards (Now Clickable!) -->
             <div class="grid md:grid-cols-3 gap-6">
-                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-teal-500/50 transition">
+                <div onclick="switchTab('simulator')" class="cursor-pointer bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-teal-500 transition hover:-translate-y-1">
                     <div class="w-12 h-12 bg-teal-950 text-teal-400 rounded-xl flex items-center justify-center text-2xl mb-4 border border-teal-800">📡</div>
-                    <h3 class="text-xl font-bold text-white mb-2">Promiscuous Mode & PCAP</h3>
+                    <h3 class="text-xl font-bold text-white mb-2">Promiscuous Mode & PCAP →</h3>
                     <p class="text-slate-400 text-sm leading-relaxed">
-                        Learn how libpcap hooks into Network Interface Cards (NICs) in promiscuous mode to intercept every frame on the broadcast domain.
+                        Click to test packet capture and inspect live frames on the network interface simulator.
                     </p>
                 </div>
-                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-teal-500/50 transition">
+                <div onclick="switchTab('simulator')" class="cursor-pointer bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-teal-500 transition hover:-translate-y-1">
                     <div class="w-12 h-12 bg-teal-950 text-teal-400 rounded-xl flex items-center justify-center text-2xl mb-4 border border-teal-800">🥞</div>
-                    <h3 class="text-xl font-bold text-white mb-2">Encapsulation Hierarchy</h3>
+                    <h3 class="text-xl font-bold text-white mb-2">Encapsulation Hierarchy →</h3>
                     <p class="text-slate-400 text-sm leading-relaxed">
-                        Examine Ethernet II frames, IP headers, TCP/UDP transport segments, and Application payloads layer by layer.
+                        Click to examine Ethernet II, IP headers, and TCP transport layers in the 3-pane inspector.
                     </p>
                 </div>
-                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-teal-500/50 transition">
+                <div onclick="switchTab('labs')" class="cursor-pointer bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-teal-500 transition hover:-translate-y-1">
                     <div class="w-12 h-12 bg-teal-950 text-teal-400 rounded-xl flex items-center justify-center text-2xl mb-4 border border-teal-800">🛡️</div>
-                    <h3 class="text-xl font-bold text-white mb-2">Threat Reconstruction</h3>
+                    <h3 class="text-xl font-bold text-white mb-2">Threat Reconstruction →</h3>
                     <p class="text-slate-400 text-sm leading-relaxed">
-                        Reassemble fragmented TCP streams to extract leaked credentials, malware payloads, and C2 beacons.
+                        Click to launch guided threat investigation labs and hunt down simulated cyber attacks.
                     </p>
                 </div>
             </div>
@@ -435,6 +424,7 @@
 
         function renderPackets() {
             const tbody = document.getElementById('packet-tbody');
+            if (!tbody) return;
             tbody.innerHTML = '';
             let displayed = 0;
             packets.forEach(p => {
@@ -462,9 +452,10 @@
             });
             document.getElementById('displayed-count').innerText = displayed;
             document.getElementById('total-count').innerText = packets.length;
-            if (document.getElementById('autoscroll-check').checked) {
+            const autoScrollCheck = document.getElementById('autoscroll-check');
+            if (autoScrollCheck && autoScrollCheck.checked) {
                 const scrollable = document.getElementById('pane1-scroll-container');
-                scrollable.scrollTop = scrollable.scrollHeight;
+                if (scrollable) scrollable.scrollTop = scrollable.scrollHeight;
             }
         }
 
