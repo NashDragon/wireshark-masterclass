@@ -107,14 +107,14 @@
                         Dissect Network Packets at <span class="text-teal-400">Wire Speed</span>
                     </h1>
                     <p class="text-lg text-slate-300 leading-relaxed">
-                        Master the world’s leading network analyzer. Capture live traffic, inspect multi-layer encapsulation, reconstruct TCP conversations, perform forensic threat hunting, and explore video walkthroughs.
+                        Master the world’s leading network analyzer. Capture live traffic, inspect multi-layer encapsulation, reconstruct TCP conversations, perform forensic threat hunting, and earn your certification.
                     </p>
                     <div class="flex flex-wrap gap-4 pt-2">
                         <button onclick="switchTab('simulator')" class="bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold px-6 py-3.5 rounded-xl shadow-lg transition flex items-center gap-2">
                             <span>🚀</span> Launch Capture Engine
                         </button>
-                        <button onclick="switchTab('videos')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-6 py-3.5 rounded-xl border border-slate-700 transition flex items-center gap-2">
-                            <span>🎥</span> Watch Video Guides
+                        <button onclick="switchTab('cert')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-6 py-3.5 rounded-xl border border-slate-700 transition flex items-center gap-2">
+                            <span>🎓</span> Take 20-Q Exam
                         </button>
                     </div>
                 </div>
@@ -136,11 +136,11 @@
                         Examine Ethernet II, IP headers, and TCP transport layers in the 3-pane inspector.
                     </p>
                 </div>
-                <div onclick="switchTab('labs')" class="cursor-pointer bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-teal-500 transition hover:-translate-y-1">
-                    <div class="w-12 h-12 bg-teal-950 text-teal-400 rounded-xl flex items-center justify-center text-2xl mb-4 border border-teal-800">🛡️</div>
-                    <h3 class="text-xl font-bold text-white mb-2">Threat Reconstruction →</h3>
+                <div onclick="switchTab('cert')" class="cursor-pointer bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-teal-500 transition hover:-translate-y-1">
+                    <div class="w-12 h-12 bg-teal-950 text-teal-400 rounded-xl flex items-center justify-center text-2xl mb-4 border border-teal-800">🎓</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Certified Analyst Exam →</h3>
                     <p class="text-slate-400 text-sm leading-relaxed">
-                        Launch guided threat investigation labs and hunt down simulated cyber attacks.
+                        Test your knowledge across 20 rigorous exam questions to earn your official certificate.
                     </p>
                 </div>
             </div>
@@ -314,7 +314,7 @@
                         </div>
                         <div class="p-5 space-y-2 flex-grow">
                             <h3 class="font-bold text-white text-base">Wireshark Tutorial for Beginners (Step-by-Step Guide)</h3>
-                            <p class="text-slate-400 text-xs leading-relaxed">A complete foundational walkthrough covering live packet capturing, DNS troubleshooting, and TCP stream behavior.</p>
+                            <p class="text-slate-400 text-xs leading-relaxed">A complete foundational walkthrough covering live packet capturing, DNS troubleshooting, and TCP stream behavior[cite: 1, 10].</p>
                         </div>
                     </div>
 
@@ -339,29 +339,26 @@
             </div>
         </section>
 
-        <!-- TAB 7: CERTIFICATION -->
-        <section id="tab-cert" class="tab-content hidden space-y-8">
-            <div class="bg-slate-900 p-8 rounded-3xl border border-slate-800 text-center space-y-3 max-w-2xl mx-auto">
+        <!-- TAB 7: CERTIFICATION (20 QUESTIONS) -->
+        <section id="tab-cert" class="tab-content hidden space-y-8 max-w-4xl mx-auto">
+            <div class="bg-slate-900 p-8 rounded-3xl border border-slate-800 text-center space-y-3">
                 <h2 class="text-3xl font-extrabold text-white">Wireshark Certified Analyst Exam</h2>
-                <p class="text-slate-400 text-sm">Answer correctly to generate your certificate.</p>
+                <p class="text-slate-400 text-sm">Answer all 20 questions correctly (80% passing score: 16/20) to generate your certificate.</p>
             </div>
-            <div class="max-w-2xl mx-auto space-y-6">
-                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
-                    <p class="font-semibold text-white">1. Which display filter isolates all DNS traffic?</p>
-                    <div class="space-y-2 text-xs font-mono">
-                        <label class="block p-3 bg-slate-950 rounded-xl cursor-pointer"><input type="radio" name="cert_q1" value="a"> port.dns == 53</label>
-                        <label class="block p-3 bg-slate-950 rounded-xl cursor-pointer"><input type="radio" name="cert_q1" value="b"> dns</label>
-                    </div>
-                </div>
-                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4 text-center">
-                    <input id="cert-name-input" type="text" placeholder="Your Full Name" class="w-full bg-slate-950 text-center text-teal-300 font-bold px-4 py-3 rounded-xl border border-slate-800">
-                    <button onclick="evaluateCertification()" class="w-full bg-teal-500 text-slate-950 font-bold py-3.5 rounded-xl">Generate Certificate</button>
-                    <div id="cert-quiz-status" class="text-sm font-bold font-mono"></div>
-                </div>
+            
+            <div id="exam-questions-container" class="space-y-6">
+                <!-- Dynamically injected via JavaScript -->
             </div>
-            <div id="cert-canvas-wrapper" class="hidden max-w-2xl mx-auto space-y-4 text-center">
+
+            <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4 text-center">
+                <input id="cert-name-input" type="text" placeholder="Your Full Name for Certificate" class="w-full bg-slate-950 text-center text-teal-300 font-bold px-4 py-3 rounded-xl border border-slate-800 text-sm">
+                <button onclick="evaluateCertification()" class="w-full bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold py-3.5 rounded-xl transition">Grade Exam & Generate Certificate</button>
+                <div id="cert-quiz-status" class="text-sm font-bold font-mono"></div>
+            </div>
+
+            <div id="cert-canvas-wrapper" class="hidden space-y-4 text-center">
                 <canvas id="cert-canvas" width="800" height="500" class="w-full rounded-2xl border border-slate-800 shadow-2xl"></canvas>
-                <button onclick="downloadCertificate()" class="bg-teal-500 text-slate-950 font-bold px-6 py-3 rounded-xl">Download PNG</button>
+                <button onclick="downloadCertificate()" class="bg-teal-500 text-slate-950 font-bold px-6 py-3 rounded-xl">Download PNG Certificate</button>
             </div>
         </section>
 
@@ -396,6 +393,47 @@
             { src: "10.0.0.99", dst: "192.168.1.1", proto: "HTTP", len: "340", info: "POST /api/v1/auth user=admin&pass=Secret123", hex: "0000  50 4f 53 54 20 2f 61 70 69 2f 76 31 2f 61 75 74", layers: ["Frame 4: POST /api/v1/auth", "Payload: user=admin&pass=Secret123"], stream: "POST /api/v1/auth\nuser=admin&pass=Secret123" }
         ];
 
+        // 20 Exam Questions Database
+        const examQuestions = [
+            { q: "1. Which display filter isolates all DNS traffic?", options: ["port.dns == 53", "dns"], correct: 1 },
+            { q: "2. What library/driver does Wireshark use for live packet capture on Windows?", options: ["Npcap", "libxml", "system32"], correct: 0 },
+            { q: "3. Which display filter isolates HTTP traffic?", options: ["tcp.port == 80", "http"], correct: 1 },
+            { q: "4. What mode must a network interface be in to capture all traffic on a local segment?", options: ["Promiscuous mode", "Monitor mode", "Stealth mode"], correct: 0 },
+            { q: "5. Which feature allows reassembling a full TCP conversation into text?", options: ["Follow TCP Stream", "Merge Packets", "Export Objects"], correct: 0 },
+            { q: "6. What is the command-line companion tool to Wireshark?", options: ["tcpdump", "tshark", "nmap"], correct: 1 },
+            { q: "7. Which display filter isolates ICMP (ping) packets?", options: ["ping", "icmp", "tcp.flags.syn == 1"], correct: 1 },
+            { q: "8. What standard file format does modern Wireshark use for captures?", options: [".pcapng", ".txt", ".exe"], correct: 0 },
+            { q: "9. Which layer of the OSI model does an Ethernet II frame operate at?", options: ["Layer 2 (Data Link)", "Layer 3 (Network)", "Layer 4 (Transport)"], correct: 0 },
+            { q: "10. Which TCP flag is used to initiate a connection handshake?", options: ["ACK", "FIN", "SYN"], correct: 2 },
+            { q: "11. Which display filter shows traffic involving a specific IP address?", options: ["ip.addr == X", "mac.addr == X", "port == X"], correct: 0 },
+            { q: "12. What protocol resolves IP addresses to physical MAC addresses?", options: ["DNS", "ARP", "DHCP"], correct: 1 },
+            { q: "13. Which display filter isolates DHCP traffic?", options: ["dhcp", "http", "ssh"], correct: 0 },
+            { q: "14. What is the primary difference between capture and display filters?", options: ["Capture filters drop packets at capture time; display filters hide them in GUI", "There is no difference", "Display filters require a reboot"], correct: 0 },
+            { q: "15. Which operator tests if a field contains a specific string value?", options: ["==", "contains", "==="], correct: 1 },
+            { q: "16. What TCP flag terminates a connection cleanly?", options: ["FIN", "RST", "PSH"], correct: 0 },
+            { q: "17. Which port does secure HTTPS traffic typically use?", options: ["80", "443", "22"], correct: 1 },
+            { q: "18. Which Wireshark feature displays bandwidth usage and packet rates over time?", options: ["I/O Graph", "Expert Info", "Protocol Hierarchy"], correct: 0 },
+            { q: "19. What does 'SYN Flood' represent in network security?", options: ["A Denial of Service attack", "A legitimate file download", "A DNS query burst"], correct: 0 },
+            { q: "20. Which display filter isolates TLS/SSL encrypted traffic?", options: ["tls", "http", "arp"], correct: 0 }
+        ];
+
+        function loadExamQuestions() {
+            const container = document.getElementById('exam-questions-container');
+            if (!container) return;
+            container.innerHTML = examQuestions.map((item, idx) => `
+                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
+                    <p class="font-semibold text-white text-sm">${item.q}</p>
+                    <div class="space-y-2 text-xs font-mono">
+                        ${item.options.map((opt, optIdx) => `
+                            <label class="block p-3 bg-slate-950 rounded-xl cursor-pointer hover:bg-slate-800 transition">
+                                <input type="radio" name="q_${idx}" value="${optIdx}"> ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -406,6 +444,7 @@
             const activeBtn = document.getElementById(`nav-${tabId}`);
             if (activeBtn) activeBtn.classList.add('text-teal-400', 'bg-slate-800');
             if (tabId === 'analytics') renderAnalytics();
+            if (tabId === 'cert') loadExamQuestions();
         }
 
         function startSimulation() {
@@ -554,20 +593,29 @@
         }
 
         function evaluateCertification() {
-            const name = document.getElementById('cert-name-input').value.trim() || "Analyst";
-            const q1 = document.querySelector('input[name="cert_q1"]:checked')?.value;
+            const name = document.getElementById('cert-name-input').value.trim() || "Certified Analyst";
+            let score = 0;
+            examQuestions.forEach((item, idx) => {
+                const selected = document.querySelector(`input[name="q_${idx}"]:checked`);
+                if (selected && parseInt(selected.value) === item.correct) {
+                    score++;
+                }
+            });
+
             const status = document.getElementById('cert-quiz-status');
-            if (q1 === 'b') {
+            const passingNeeded = 16; // 80% of 20
+
+            if (score >= passingNeeded) {
                 status.className = "text-sm font-bold font-mono text-emerald-400";
-                status.innerText = "🌟 Passed! Certificate unlocked.";
-                renderCertificateCanvas(name);
+                status.innerText = `🌟 Passed! Score: ${score}/20. Certificate unlocked!`;
+                renderCertificateCanvas(name, score);
             } else {
-                status.className = "text-sm font-bold font-mono text-amber-400";
-                status.innerText = "⚠️ Incorrect answer.";
+                status.className = "text-sm font-bold font-mono text-rose-400";
+                status.innerText = `⚠️ Score: ${score}/20. You need at least 16/20 (80%) to pass. Try again!`;
             }
         }
 
-        function renderCertificateCanvas(name) {
+        function renderCertificateCanvas(name, score) {
             document.getElementById('cert-canvas-wrapper').classList.remove('hidden');
             const canvas = document.getElementById('cert-canvas');
             const ctx = canvas.getContext('2d');
@@ -577,12 +625,24 @@
             ctx.lineWidth = 10;
             ctx.strokeRect(20, 20, 760, 460);
             ctx.fillStyle = '#2dd4bf';
-            ctx.font = 'bold 28px Inter';
+            ctx.font = 'bold 26px Inter';
             ctx.textAlign = 'center';
-            ctx.fillText('CERTIFICATE OF ACCOMPLISHMENT', 400, 90);
+            ctx.fillText('CERTIFICATE OF ACCOMPLISHMENT', 400, 85);
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '14px Inter';
+            ctx.fillText('This is proudly presented to', 400, 135);
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 36px Inter';
-            ctx.fillText(name, 400, 210);
+            ctx.font = 'bold 34px Inter';
+            ctx.fillText(name, 400, 190);
+            ctx.fillStyle = '#cbd5e1';
+            ctx.font = '15px Inter';
+            ctx.fillText('for successfully passing the 20-Question Wireshark Certified Analyst Exam', 400, 245);
+            ctx.fillStyle = '#14b8a6';
+            ctx.font = 'bold 18px Fira Code';
+            ctx.fillText(`Final Exam Score: ${score} / 20 (80%+ Passing Grade)`, 400, 310);
+            ctx.fillStyle = '#64748b';
+            ctx.font = '12px Fira Code';
+            ctx.fillText('Wireshark 101 Ultra Masterclass Suite', 400, 410);
         }
 
         function downloadCertificate() {
@@ -596,6 +656,7 @@
         window.onload = () => {
             loadPresetTraffic('mixed');
             startSimulation();
+            loadExamQuestions();
         };
     </script>
 </body>
