@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wireshark 101 & Advanced Packet Analysis Masterclass</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            900: '#134e4a',
+                            950: '#042f2e',
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['"Fira Code"', 'Monaco', 'Consolas', 'monospace'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'Fira Code', monospace; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0d9488; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-teal-500 selection:text-slate-950">
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('overview')">
+                    <span class="text-3xl">🦈</span>
+                    <div>
+                        <span class="font-extrabold text-xl tracking-wider bg-gradient-to-r from-teal-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">Wireshark101</span>
+                        <span class="hidden sm:inline-block text-xs bg-teal-950 text-teal-400 border border-teal-800 px-2 py-0.5 rounded-full ml-2 font-mono">v3.0 Ultra</span>
+                    </div>
+                </div>
+
+                <!-- Nav Links -->
+                <nav class="hidden lg:flex space-x-1 text-sm font-medium">
+                    <button onclick="switchTab('overview')" id="nav-overview" class="nav-btn text-teal-400 bg-slate-800 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+                        <span>📖</span> Overview
+                    </button>
+                    <button onclick="switchTab('simulator')" id="nav-simulator" class="nav-btn text-slate-300 hover:text-teal-400 hover:bg-slate-800/60 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+                        <span>⚡</span> Capture Lab
+                    </button>
+                    <button onclick="switchTab('analytics')" id="nav-analytics" class="nav-btn text-slate-300 hover:text-teal-400 hover:bg-slate-800/60 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+                        <span>📊</span> Traffic Analytics
+                    </button>
+                    <button onclick="switchTab('filters')" id="nav-filters" class="nav-btn text-slate-300 hover:text-teal-400 hover:bg-slate-800/60 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+                        <span>🔍</span> Filter Builder
+                    </button>
+                    <button onclick="switchTab('labs')" id="nav-labs" class="nav-btn text-slate-300 hover:text-teal-400 hover:bg-slate-800/60 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+                        <span>🧪</span> Threat Labs
+                    </button>
+                    <button onclick="switchTab('tshark')" id="nav-tshark" class="nav-btn text-slate-300 hover:text-teal-400 hover:bg-slate-800/60 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+                        <span>💻</span> tshark CLI
+                    </button>
+                    <button onclick="switchTab('cert')" id="nav-cert" class="nav-btn text-slate-300 hover:text-teal-400 hover:bg-slate-800/60 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+                        <span>🎓</span> Certification
+                    </button>
+                </nav>
+
+                <!-- Status Badge -->
+                <div class="flex items-center gap-3">
+                    <div id="capture-status-badge" class="flex items-center gap-2 bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-full text-xs font-mono">
+                        <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span id="status-text" class="text-slate-300 hidden sm:inline">Engine Live</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Nav Bar -->
+        <div class="lg:hidden flex overflow-x-auto border-t border-slate-800 p-2 gap-1 text-xs font-medium no-scrollbar bg-slate-950">
+            <button onclick="switchTab('overview')" class="px-3 py-1.5 rounded bg-slate-800 text-teal-400 whitespace-nowrap">Overview</button>
+            <button onclick="switchTab('simulator')" class="px-3 py-1.5 rounded bg-slate-900 text-slate-300 whitespace-nowrap">Capture Lab</button>
+            <button onclick="switchTab('analytics')" class="px-3 py-1.5 rounded bg-slate-900 text-slate-300 whitespace-nowrap">Analytics</button>
+            <button onclick="switchTab('filters')" class="px-3 py-1.5 rounded bg-slate-900 text-slate-300 whitespace-nowrap">Filters</button>
+            <button onclick="switchTab('labs')" class="px-3 py-1.5 rounded bg-slate-900 text-slate-300 whitespace-nowrap">Threat Labs</button>
+            <button onclick="switchTab('tshark')" class="px-3 py-1.5 rounded bg-slate-900 text-slate-300 whitespace-nowrap">tshark CLI</button>
+            <button onclick="switchTab('cert')" class="px-3 py-1.5 rounded bg-slate-900 text-slate-300 whitespace-nowrap">Certificate</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- TAB 1: OVERVIEW -->
+        <section id="tab-overview" class="tab-content space-y-12">
+            <div class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-teal-950/50 p-8 sm:p-12 rounded-3xl border border-slate-800 shadow-2xl">
+                <div class="max-w-3xl space-y-6 relative z-10">
+                    <span class="inline-flex items-center gap-2 bg-teal-950/90 text-teal-400 border border-teal-800 px-3.5 py-1 rounded-full text-xs font-semibold uppercase tracking-widest">
+                        <span>🔥</span> Interactive Cyber Operations Suite
+                    </span>
+                    <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white leading-tight">
+                        Dissect Network Packets at <span class="text-teal-400">Wire Speed</span>
+                    </h1>
+                    <p class="text-lg text-slate-300 leading-relaxed">
+                        Master the world’s leading network analyzer. Capture live traffic, inspect multi-layer encapsulation, reconstruct TCP conversations, perform forensic threat hunting, and command <code class="bg-slate-950 text-teal-300 px-2 py-0.5 rounded font-mono text-sm">tshark</code> from the command line.
+                    </p>
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <button onclick="switchTab('simulator')" class="bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold px-6 py-3.5 rounded-xl shadow-lg transition flex items-center gap-2">
+                            <span>🚀</span> Launch Capture Engine
+                        </button>
+                        <button onclick="switchTab('labs')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-6 py-3.5 rounded-xl border border-slate-700 transition flex items-center gap-2">
+                            <span>🕵️‍♂️</span> Threat Investigation Labs
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Core Fundamentals Cards -->
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-teal-500/50 transition">
+                    <div class="w-12 h-12 bg-teal-950 text-teal-400 rounded-xl flex items-center justify-center text-2xl mb-4 border border-teal-800">📡</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Promiscuous Mode & PCAP</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Learn how libpcap hooks into Network Interface Cards (NICs) in promiscuous mode to intercept every frame on the broadcast domain.
+                    </p>
+                </div>
+                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-teal-500/50 transition">
+                    <div class="w-12 h-12 bg-teal-950 text-teal-400 rounded-xl flex items-center justify-center text-2xl mb-4 border border-teal-800">🥞</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Encapsulation Hierarchy</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Examine Ethernet II frames, IP headers, TCP/UDP transport segments, and Application payloads layer by layer.
+                    </p>
+                </div>
+                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-teal-500/50 transition">
+                    <div class="w-12 h-12 bg-teal-950 text-teal-400 rounded-xl flex items-center justify-center text-2xl mb-4 border border-teal-800">🛡️</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Threat Reconstruction</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Reassemble fragmented TCP streams to extract leaked credentials, malware payloads, and C2 beacons.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: CAPTURE SIMULATOR -->
+        <section id="tab-simulator" class="tab-content hidden space-y-4">
+            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3">
+                <div class="flex flex-col lg:flex-row gap-3 items-center justify-between">
+                    <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                        <button id="btn-toggle-sim" onclick="toggleSimulation()" class="bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs flex items-center gap-1.5 transition">
+                            <span id="sim-icon">⏸️</span> <span id="sim-text">Pause Live Capture</span>
+                        </button>
+                        <button onclick="clearCapture()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg text-xs flex items-center gap-1.5 transition border border-slate-700">
+                            <span>🧹</span> Clear
+                        </button>
+                        <button id="btn-follow-stream" onclick="openFollowStreamModal()" disabled class="disabled:opacity-50 disabled:cursor-not-allowed bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3 py-2 rounded-lg text-xs flex items-center gap-1.5 transition">
+                            <span>💬</span> Follow TCP Stream
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-2 w-full lg:w-auto overflow-x-auto no-scrollbar">
+                        <span class="text-xs text-slate-400 font-mono whitespace-nowrap">Presets:</span>
+                        <button onclick="loadPresetTraffic('mixed')" class="bg-slate-950 text-teal-300 border border-slate-800 px-2 py-1 rounded text-xs font-mono">Mixed</button>
+                        <button onclick="loadPresetTraffic('synflood')" class="bg-slate-950 text-rose-400 border border-slate-800 px-2 py-1 rounded text-xs font-mono">SYN Flood</button>
+                        <button onclick="loadPresetTraffic('c2')" class="bg-slate-950 text-purple-400 border border-slate-800 px-2 py-1 rounded text-xs font-mono">C2</button>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <div class="relative w-full">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 font-mono text-xs">Filter:</span>
+                        <input id="filter-input" type="text" placeholder='e.g. http, dns, ip.addr == 192.168.1.15' 
+                               class="w-full bg-slate-950 text-teal-300 font-mono text-xs rounded-lg pl-20 pr-20 py-2.5 border border-slate-800 focus:outline-none">
+                        <button onclick="applyFilter()" class="absolute inset-y-1 right-1 bg-teal-600 hover:bg-teal-500 text-slate-950 font-bold px-3 text-xs rounded transition">
+                            Apply
+                        </button>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 px-1 pt-1">
+                    <div>Displayed: <strong id="displayed-count" class="text-teal-400">0</strong> | Total: <strong id="total-count" class="text-slate-200">0</strong></div>
+                </div>
+            </div>
+
+            <!-- 3-Pane Layout -->
+            <div class="grid grid-cols-1 gap-4">
+                <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                    <div class="bg-slate-950 px-4 py-2 border-b border-slate-800 text-xs font-mono text-slate-400 font-bold flex justify-between">
+                        <span>PANE 1: Packet Summary List</span>
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" id="autoscroll-check" checked> Auto-Scroll</label>
+                    </div>
+                    <div class="overflow-x-auto max-h-[250px]" id="pane1-scroll-container">
+                        <table class="w-full text-left border-collapse font-mono text-xs whitespace-nowrap">
+                            <thead class="bg-slate-950/90 text-slate-400 sticky top-0 border-b border-slate-800">
+                                <tr>
+                                    <th class="py-2 px-3">No.</th>
+                                    <th class="py-2 px-3">Time</th>
+                                    <th class="py-2 px-3">Source</th>
+                                    <th class="py-2 px-3">Destination</th>
+                                    <th class="py-2 px-3">Protocol</th>
+                                    <th class="py-2 px-3">Length</th>
+                                    <th class="py-2 px-3">Info</th>
+                                </tr>
+                            </thead>
+                            <tbody id="packet-tbody" class="divide-y divide-slate-800/40"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-4">
+                    <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden flex flex-col h-[280px]">
+                        <div class="bg-slate-950 px-4 py-2 border-b border-slate-800 text-xs font-mono text-slate-400 font-bold flex justify-between">
+                            <span>PANE 2: Packet Details</span>
+                            <span id="pane2-pkt-id" class="text-teal-400">No Packet Selected</span>
+                        </div>
+                        <div id="pane-details" class="p-4 overflow-y-auto font-mono text-xs space-y-3 text-slate-300">
+                            <p class="text-slate-500 italic">Select a packet from Pane 1.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden flex flex-col h-[280px]">
+                        <div class="bg-slate-950 px-4 py-2 border-b border-slate-800 text-xs font-mono text-slate-400 font-bold">PANE 3: Hex Inspector</div>
+                        <div id="pane-hex" class="p-4 overflow-y-auto font-mono text-xs text-teal-300 whitespace-pre bg-slate-950/80 h-full">
+                            <span class="text-slate-500 italic">Select a packet for hex dump.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: ANALYTICS -->
+        <section id="tab-analytics" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900 p-6 rounded-3xl border border-slate-800 space-y-4">
+                <h2 class="text-2xl font-bold text-white">Live Traffic Analytics & Statistics</h2>
+                <div class="h-32 w-full bg-slate-950 rounded-xl p-2 border border-slate-800">
+                    <canvas id="pps-canvas" class="w-full h-full"></canvas>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div id="protocol-stats-list" class="space-y-2 font-mono text-xs bg-slate-950 p-4 rounded-xl border border-slate-800"></div>
+                    <div id="top-talkers-list" class="space-y-2 font-mono text-xs bg-slate-950 p-4 rounded-xl border border-slate-800"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: FILTER BUILDER -->
+        <section id="tab-filters" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900 p-8 rounded-3xl border border-slate-800 space-y-4">
+                <h2 class="text-2xl font-bold text-white">Display Filter Master Matrix</h2>
+                <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <h3 class="font-bold text-teal-400 text-xs font-mono uppercase">Expression Builder</h3>
+                    <div class="grid sm:grid-cols-4 gap-3">
+                        <select id="builder-field" class="bg-slate-900 text-slate-200 text-xs font-mono p-2.5 rounded-lg border border-slate-800">
+                            <option value="ip.addr">ip.addr</option>
+                            <option value="ip.src">ip.src</option>
+                            <option value="ip.dst">ip.dst</option>
+                        </select>
+                        <select id="builder-op" class="bg-slate-900 text-slate-200 text-xs font-mono p-2.5 rounded-lg border border-slate-800">
+                            <option value="==">==</option>
+                            <option value="contains">contains</option>
+                        </select>
+                        <input id="builder-val" type="text" placeholder="Value (e.g. 192.168.1.15)" class="bg-slate-900 text-teal-300 text-xs font-mono p-2.5 rounded-lg border border-slate-800">
+                        <button onclick="buildAndTestFilter()" class="bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs py-2.5 rounded-lg">Build & Apply</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: THREAT LABS -->
+        <section id="tab-labs" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900 p-8 rounded-3xl border border-slate-800 space-y-6">
+                <h2 class="text-2xl font-bold text-white">Cyber Incident Response Threat Labs</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <span class="bg-amber-950 text-amber-400 px-2 py-0.5 rounded text-xs font-mono font-bold">Lab 1: Cleartext Auth</span>
+                        <h3 class="font-bold text-white">Unencrypted Credential Leak</h3>
+                        <p class="text-slate-400 text-xs">Locate the login POST request and extract the plaintext password.</p>
+                        <button onclick="startLabScenario('cleartext')" class="w-full bg-teal-500 text-slate-950 font-bold py-2 rounded text-xs">Start Lab</button>
+                    </div>
+                    <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <span class="bg-rose-950 text-rose-400 px-2 py-0.5 rounded text-xs font-mono font-bold">Lab 2: DoS Attack</span>
+                        <h3 class="font-bold text-white">TCP SYN Flood</h3>
+                        <p class="text-slate-400 text-xs">Identify the malicious external IP address launching the SYN flood.</p>
+                        <button onclick="startLabScenario('synflood')" class="w-full bg-teal-500 text-slate-950 font-bold py-2 rounded text-xs">Start Lab</button>
+                    </div>
+                </div>
+                <div id="lab-console" class="hidden bg-slate-950 p-6 rounded-2xl border border-teal-500/50 space-y-4">
+                    <h3 id="lab-title" class="font-bold text-teal-400 text-lg">Lab Active</h3>
+                    <p id="lab-description" class="text-slate-300 text-sm"></p>
+                    <div class="flex gap-2">
+                        <input id="lab-answer-input" type="text" placeholder="Enter answer..." class="bg-slate-900 text-teal-300 text-xs font-mono px-3 py-2 rounded border border-slate-800 flex-grow">
+                        <button onclick="verifyLabAnswer()" class="bg-teal-500 text-slate-950 font-bold px-4 py-2 rounded text-xs">Verify</button>
+                    </div>
+                    <div id="lab-result" class="text-xs font-mono font-bold"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 6: TSHARK CLI -->
+        <section id="tab-tshark" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900 p-8 rounded-3xl border border-slate-800 space-y-4">
+                <h2 class="text-2xl font-bold text-white">tshark CLI Reference Guide</h2>
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-teal-300">
+                    tshark -i eth0 -w capture.pcap
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 7: CERTIFICATION -->
+        <section id="tab-cert" class="tab-content hidden space-y-8">
+            <div class="bg-slate-900 p-8 rounded-3xl border border-slate-800 text-center space-y-3 max-w-2xl mx-auto">
+                <h2 class="text-3xl font-extrabold text-white">Wireshark Certified Analyst Exam</h2>
+                <p class="text-slate-400 text-sm">Answer correctly to generate your certificate.</p>
+            </div>
+            <div class="max-w-2xl mx-auto space-y-6">
+                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
+                    <p class="font-semibold text-white">1. Which display filter isolates all DNS traffic?</p>
+                    <div class="space-y-2 text-xs font-mono">
+                        <label class="block p-3 bg-slate-950 rounded-xl cursor-pointer"><input type="radio" name="cert_q1" value="a"> port.dns == 53</label>
+                        <label class="block p-3 bg-slate-950 rounded-xl cursor-pointer"><input type="radio" name="cert_q1" value="b"> dns</label>
+                    </div>
+                </div>
+                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4 text-center">
+                    <input id="cert-name-input" type="text" placeholder="Your Full Name" class="w-full bg-slate-950 text-center text-teal-300 font-bold px-4 py-3 rounded-xl border border-slate-800">
+                    <button onclick="evaluateCertification()" class="w-full bg-teal-500 text-slate-950 font-bold py-3.5 rounded-xl">Generate Certificate</button>
+                    <div id="cert-quiz-status" class="text-sm font-bold font-mono"></div>
+                </div>
+            </div>
+            <div id="cert-canvas-wrapper" class="hidden max-w-2xl mx-auto space-y-4 text-center">
+                <canvas id="cert-canvas" width="800" height="500" class="w-full rounded-2xl border border-slate-800 shadow-2xl"></canvas>
+                <button onclick="downloadCertificate()" class="bg-teal-500 text-slate-950 font-bold px-6 py-3 rounded-xl">Download PNG</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOLLOW TCP STREAM MODAL -->
+    <div id="stream-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 max-w-2xl w-full rounded-2xl border border-slate-800 shadow-2xl flex flex-col max-h-[80vh] overflow-hidden">
+            <div class="bg-slate-950 px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+                <h3 class="font-bold text-white text-base">Follow TCP Stream</h3>
+                <button onclick="closeFollowStreamModal()" class="text-slate-400 hover:text-white font-bold">✕</button>
+            </div>
+            <div id="stream-content" class="p-6 overflow-y-auto font-mono text-xs space-y-2 bg-slate-950/90 text-slate-200 whitespace-pre-wrap flex-grow"></div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT ENGINE -->
+    <script>
+        let packets = [];
+        let activeFilter = "";
+        let isSimulating = true;
+        let selectedPacket = null;
+        let packetCounter = 1;
+        let simInterval = null;
+        let ppsHistory = new Array(30).fill(0);
+        let activeLab = null;
+
+        const samplePool = [
+            { src: "192.168.1.15", dst: "8.8.8.8", proto: "DNS", len: "74", info: "Standard query A google.com", hex: "0000  00 11 22 33 44 55 10 00 00 ab cd ef 08 00 45 00", layers: ["Frame 1: 74 bytes on wire", "Ethernet II", "IPv4 Src: 192.168.1.15, Dst: 8.8.8.8", "DNS Query google.com"], stream: "CLIENT: Standard Query A google.com" },
+            { src: "142.250.190.46", dst: "192.168.1.15", proto: "HTTP", len: "520", info: "GET /login.php HTTP/1.1", hex: "0000  47 45 54 20 2f 6c 6f 67 69 6e 2e 70 68 70 20 48", layers: ["Frame 2: 520 bytes on wire", "HTTP GET /login.php"], stream: "GET /login.php HTTP/1.1\nHost: target.com" },
+            { src: "10.0.0.99", dst: "192.168.1.1", proto: "TCP", len: "66", info: "443 > 52144 [SYN]", hex: "0000  00 11 22 33 44 55 10 00 00 ab cd ef 08 00 45 00", layers: ["Frame 3: TCP SYN packet"], stream: "SYN Packet sent from 10.0.0.99" },
+            { src: "10.0.0.99", dst: "192.168.1.1", proto: "HTTP", len: "340", info: "POST /api/v1/auth user=admin&pass=Secret123", hex: "0000  50 4f 53 54 20 2f 61 70 69 2f 76 31 2f 61 75 74", layers: ["Frame 4: POST /api/v1/auth", "Payload: user=admin&pass=Secret123"], stream: "POST /api/v1/auth\nuser=admin&pass=Secret123" }
+        ];
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-teal-400', 'bg-slate-800');
+                btn.classList.add('text-slate-300');
+            });
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if (activeBtn) activeBtn.classList.add('text-teal-400', 'bg-slate-800');
+            if (tabId === 'analytics') renderAnalytics();
+        }
+
+        function startSimulation() {
+            if (simInterval) clearInterval(simInterval);
+            simInterval = setInterval(() => {
+                if (!isSimulating) return;
+                const randomItem = samplePool[Math.floor(Math.random() * samplePool.length)];
+                packets.push({ id: packetCounter++, time: (Date.now() / 1000 % 1000).toFixed(3), ...randomItem });
+                ppsHistory.push(ppsHistory.shift() + 1);
+                renderPackets();
+            }, 1500);
+        }
+
+        function toggleSimulation() {
+            isSimulating = !isSimulating;
+            document.getElementById('sim-text').innerText = isSimulating ? "Pause Live Capture" : "Resume Capture";
+        }
+
+        function clearCapture() {
+            packets = [];
+            selectedPacket = null;
+            renderPackets();
+        }
+
+        function loadPresetTraffic(key) {
+            clearCapture();
+            samplePool.forEach((item, idx) => {
+                packets.push({ id: packetCounter++, time: (10.000 + idx * 0.150).toFixed(3), ...item });
+            });
+            renderPackets();
+        }
+
+        function applyFilter() {
+            activeFilter = document.getElementById('filter-input').value.trim().toLowerCase();
+            renderPackets();
+        }
+
+        function buildAndTestFilter() {
+            const field = document.getElementById('builder-field').value;
+            const op = document.getElementById('builder-op').value;
+            const val = document.getElementById('builder-val').value.trim();
+            if (!val) return;
+            document.getElementById('filter-input').value = `${field} ${op} "${val}"`;
+            switchTab('simulator');
+            applyFilter();
+        }
+
+        function renderPackets() {
+            const tbody = document.getElementById('packet-tbody');
+            tbody.innerHTML = '';
+            let displayed = 0;
+            packets.forEach(p => {
+                let matches = true;
+                if (activeFilter) {
+                    const haystack = `${p.proto} ${p.src} ${p.dst} ${p.info}`.toLowerCase();
+                    if (!haystack.includes(activeFilter.replace(/"/g, ''))) matches = false;
+                }
+                if (matches) {
+                    displayed++;
+                    const tr = document.createElement('tr');
+                    tr.className = `cursor-pointer hover:bg-slate-800 transition ${selectedPacket?.id === p.id ? 'bg-teal-950 text-teal-300 font-bold border-l-4 border-teal-400' : 'text-slate-300'}`;
+                    tr.innerHTML = `
+                        <td class="py-1.5 px-3">${p.id}</td>
+                        <td class="py-1.5 px-3 text-slate-500">${p.time}</td>
+                        <td class="py-1.5 px-3 text-teal-300">${p.src}</td>
+                        <td class="py-1.5 px-3 text-blue-400">${p.dst}</td>
+                        <td class="py-1.5 px-3 font-bold text-teal-400">${p.proto}</td>
+                        <td class="py-1.5 px-3 text-slate-500">${p.len}</td>
+                        <td class="py-1.5 px-3 truncate max-w-xs">${p.info}</td>
+                    `;
+                    tr.onclick = () => selectPacket(p);
+                    tbody.appendChild(tr);
+                }
+            });
+            document.getElementById('displayed-count').innerText = displayed;
+            document.getElementById('total-count').innerText = packets.length;
+            if (document.getElementById('autoscroll-check').checked) {
+                const scrollable = document.getElementById('pane1-scroll-container');
+                scrollable.scrollTop = scrollable.scrollHeight;
+            }
+        }
+
+        function selectPacket(p) {
+            selectedPacket = p;
+            renderPackets();
+            document.getElementById('pane2-pkt-id').innerText = `Frame #${p.id} (${p.proto})`;
+            document.getElementById('btn-follow-stream').disabled = false;
+            document.getElementById('pane-details').innerHTML = p.layers.map(l => `<div class="border-b border-slate-800 pb-1">▶ ${l}</div>`).join('');
+            document.getElementById('pane-hex').innerText = p.hex;
+        }
+
+        function openFollowStreamModal() {
+            if (!selectedPacket) return;
+            document.getElementById('stream-modal').classList.remove('hidden');
+            document.getElementById('stream-content').innerText = selectedPacket.stream || "No stream payload.";
+        }
+
+        function closeFollowStreamModal() {
+            document.getElementById('stream-modal').classList.add('hidden');
+        }
+
+        function renderAnalytics() {
+            const canvas = document.getElementById('pps-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#2dd4bf';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            const step = canvas.width / (ppsHistory.length - 1);
+            ppsHistory.forEach((val, i) => {
+                const x = i * step;
+                const y = canvas.height - (val * 10);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+        }
+
+        const labData = {
+            cleartext: { title: "Lab 1: Cleartext Auth", desc: "Find the HTTP POST request password.", answer: "Secret123" },
+            synflood: { title: "Lab 2: SYN Flood", desc: "Identify the attacking IP.", answer: "10.0.0.99" }
+        };
+
+        function startLabScenario(key) {
+            activeLab = labData[key];
+            document.getElementById('lab-console').classList.remove('hidden');
+            document.getElementById('lab-title').innerText = activeLab.title;
+            document.getElementById('lab-description').innerText = activeLab.desc;
+            loadPresetTraffic('mixed');
+            switchTab('simulator');
+        }
+
+        function verifyLabAnswer() {
+            const input = document.getElementById('lab-answer-input').value.trim();
+            const res = document.getElementById('lab-result');
+            if (input.toLowerCase() === activeLab.answer.toLowerCase()) {
+                res.className = "text-xs font-mono font-bold mt-2 text-emerald-400";
+                res.innerText = "🎉 Correct!";
+            } else {
+                res.className = "text-xs font-mono font-bold mt-2 text-rose-400";
+                res.innerText = "❌ Incorrect.";
+            }
+        }
+
+        function evaluateCertification() {
+            const name = document.getElementById('cert-name-input').value.trim() || "Analyst";
+            const q1 = document.querySelector('input[name="cert_q1"]:checked')?.value;
+            const status = document.getElementById('cert-quiz-status');
+            if (q1 === 'b') {
+                status.className = "text-sm font-bold font-mono text-emerald-400";
+                status.innerText = "🌟 Passed! Certificate unlocked.";
+                renderCertificateCanvas(name);
+            } else {
+                status.className = "text-sm font-bold font-mono text-amber-400";
+                status.innerText = "⚠️ Incorrect answer.";
+            }
+        }
+
+        function renderCertificateCanvas(name) {
+            document.getElementById('cert-canvas-wrapper').classList.remove('hidden');
+            const canvas = document.getElementById('cert-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#020617';
+            ctx.fillRect(0, 0, 800, 500);
+            ctx.strokeStyle = '#0d9488';
+            ctx.lineWidth = 10;
+            ctx.strokeRect(20, 20, 760, 460);
+            ctx.fillStyle = '#2dd4bf';
+            ctx.font = 'bold 28px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText('CERTIFICATE OF ACCOMPLISHMENT', 400, 90);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 36px Inter';
+            ctx.fillText(name, 400, 210);
+        }
+
+        function downloadCertificate() {
+            const canvas = document.getElementById('cert-canvas');
+            const link = document.createElement('a');
+            link.download = 'Wireshark_Certified_Analyst.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        window.onload = () => {
+            loadPresetTraffic('mixed');
+            startSimulation();
+        };
+    </script>
+</body>
+</html>
