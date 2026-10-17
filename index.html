@@ -57,7 +57,7 @@
                     </div>
                 </div>
 
-                <!-- Nav Links with proper IDs -->
+                <!-- Nav Links -->
                 <nav class="hidden lg:flex space-x-1 text-sm font-medium">
                     <button onclick="switchTab('overview')" id="nav-overview" class="nav-btn text-teal-400 bg-slate-800 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
                         <span>📖</span> Overview
@@ -74,8 +74,8 @@
                     <button onclick="switchTab('labs')" id="nav-labs" class="nav-btn text-slate-300 hover:text-teal-400 hover:bg-slate-800/60 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
                         <span>🧪</span> Threat Labs
                     </button>
-                    <button onclick="switchTab('tshark')" id="nav-tshark" class="nav-btn text-slate-300 hover:text-teal-400 hover:bg-slate-800/60 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
-                        <span>💻</span> tshark CLI
+                    <button onclick="switchTab('videos')" id="nav-videos" class="nav-btn text-slate-300 hover:text-teal-400 hover:bg-slate-800/60 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+                        <span>🎥</span> Video Guides
                     </button>
                     <button onclick="switchTab('cert')" id="nav-cert" class="nav-btn text-slate-300 hover:text-teal-400 hover:bg-slate-800/60 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
                         <span>🎓</span> Certification
@@ -107,40 +107,40 @@
                         Dissect Network Packets at <span class="text-teal-400">Wire Speed</span>
                     </h1>
                     <p class="text-lg text-slate-300 leading-relaxed">
-                        Master the world’s leading network analyzer. Capture live traffic, inspect multi-layer encapsulation, reconstruct TCP conversations, perform forensic threat hunting, and command <code class="bg-slate-950 text-teal-300 px-2 py-0.5 rounded font-mono text-sm">tshark</code> from the command line.
+                        Master the world’s leading network analyzer. Capture live traffic, inspect multi-layer encapsulation, reconstruct TCP conversations, perform forensic threat hunting, and explore video walkthroughs.
                     </p>
                     <div class="flex flex-wrap gap-4 pt-2">
                         <button onclick="switchTab('simulator')" class="bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold px-6 py-3.5 rounded-xl shadow-lg transition flex items-center gap-2">
                             <span>🚀</span> Launch Capture Engine
                         </button>
-                        <button onclick="switchTab('labs')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-6 py-3.5 rounded-xl border border-slate-700 transition flex items-center gap-2">
-                            <span>🕵️‍♂️</span> Threat Investigation Labs
+                        <button onclick="switchTab('videos')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-6 py-3.5 rounded-xl border border-slate-700 transition flex items-center gap-2">
+                            <span>🎥</span> Watch Video Guides
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Core Fundamentals Cards (Now Clickable!) -->
+            <!-- Core Fundamentals Cards -->
             <div class="grid md:grid-cols-3 gap-6">
                 <div onclick="switchTab('simulator')" class="cursor-pointer bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-teal-500 transition hover:-translate-y-1">
                     <div class="w-12 h-12 bg-teal-950 text-teal-400 rounded-xl flex items-center justify-center text-2xl mb-4 border border-teal-800">📡</div>
                     <h3 class="text-xl font-bold text-white mb-2">Promiscuous Mode & PCAP →</h3>
                     <p class="text-slate-400 text-sm leading-relaxed">
-                        Click to test packet capture and inspect live frames on the network interface simulator.
+                        Test packet capture and inspect live frames on the network interface simulator.
                     </p>
                 </div>
                 <div onclick="switchTab('simulator')" class="cursor-pointer bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-teal-500 transition hover:-translate-y-1">
                     <div class="w-12 h-12 bg-teal-950 text-teal-400 rounded-xl flex items-center justify-center text-2xl mb-4 border border-teal-800">🥞</div>
                     <h3 class="text-xl font-bold text-white mb-2">Encapsulation Hierarchy →</h3>
                     <p class="text-slate-400 text-sm leading-relaxed">
-                        Click to examine Ethernet II, IP headers, and TCP transport layers in the 3-pane inspector.
+                        Examine Ethernet II, IP headers, and TCP transport layers in the 3-pane inspector.
                     </p>
                 </div>
                 <div onclick="switchTab('labs')" class="cursor-pointer bg-slate-900 p-6 rounded-2xl border border-slate-800 hover:border-teal-500 transition hover:-translate-y-1">
                     <div class="w-12 h-12 bg-teal-950 text-teal-400 rounded-xl flex items-center justify-center text-2xl mb-4 border border-teal-800">🛡️</div>
                     <h3 class="text-xl font-bold text-white mb-2">Threat Reconstruction →</h3>
                     <p class="text-slate-400 text-sm leading-relaxed">
-                        Click to launch guided threat investigation labs and hunt down simulated cyber attacks.
+                        Launch guided threat investigation labs and hunt down simulated cyber attacks.
                     </p>
                 </div>
             </div>
@@ -298,12 +298,43 @@
             </div>
         </section>
 
-        <!-- TAB 6: TSHARK CLI -->
-        <section id="tab-tshark" class="tab-content hidden space-y-6">
-            <div class="bg-slate-900 p-8 rounded-3xl border border-slate-800 space-y-4">
-                <h2 class="text-2xl font-bold text-white">tshark CLI Reference Guide</h2>
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-teal-300">
-                    tshark -i eth0 -w capture.pcap
+        <!-- TAB 6: VIDEO GUIDES -->
+        <section id="tab-videos" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900 p-8 rounded-3xl border border-slate-800 space-y-6">
+                <div class="space-y-2">
+                    <span class="text-teal-400 text-xs font-mono uppercase tracking-widest bg-teal-950 border border-teal-800 px-3 py-1 rounded-full">Newcomer Hub</span>
+                    <h2 class="text-3xl font-bold text-white">Video Tutorials & Beginner Guides</h2>
+                    <p class="text-slate-400 text-sm">Watch these curated walkthroughs to quickly grasp packet captures, filtering, and network troubleshooting.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden flex flex-col">
+                        <div class="aspect-video w-full bg-black">
+                            <iframe class="w-full h-full" src="https://www.youtube.com/embed/NdTu3bDTBbo" title="Wireshark Tutorial for Beginners" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        <div class="p-5 space-y-2 flex-grow">
+                            <h3 class="font-bold text-white text-base">Wireshark Tutorial for Beginners (Step-by-Step Guide)</h3>
+                            <p class="text-slate-400 text-xs leading-relaxed">A complete foundational walkthrough covering live packet capturing, DNS troubleshooting, and TCP stream behavior.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 rounded-2xl border border-slate-800 overflow-hidden flex flex-col justify-between p-6">
+                        <div class="space-y-3">
+                            <span class="text-indigo-400 text-xs font-mono font-bold">📚 Recommended Learning Path</span>
+                            <h3 class="text-xl font-bold text-white">Mastering Packet Analysis</h3>
+                            <ul class="text-slate-300 text-xs space-y-2 font-mono list-disc list-inside">
+                                <li>Filter first, analyze second.</li>
+                                <li>Use capture filters vs. display filters effectively.</li>
+                                <li>Follow TCP streams to reveal plaintext credentials.</li>
+                                <li>Examine OSI layers from Ethernet II to Application payload.</li>
+                            </ul>
+                        </div>
+                        <div class="pt-4">
+                            <button onclick="switchTab('simulator')" class="w-full bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition">
+                                Test Skills in Capture Lab →
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
